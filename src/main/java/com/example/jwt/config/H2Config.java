@@ -9,8 +9,8 @@ import java.sql.SQLException;
 
 public class H2Config {
 
-    @Bean("dataSource")
-    @ConfigurationProperties(prefix = "spring.datasource")
+    @Bean
+    @ConfigurationProperties("spring.datasource")
     public HikariDataSource dataSource() throws SQLException {
         Server server = defaultRun();
         return new HikariDataSource();
@@ -21,8 +21,7 @@ public class H2Config {
                 "-tcp",
                 "-tcpAllowOthers",
                 "-ifNotExists",
-                "-tcpPort", 9095 + ""
-        ).start();
+                "-tcpPort", 9092 + "").start();
     }
 
 }
