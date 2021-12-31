@@ -1,16 +1,18 @@
 package com.example.jwt.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+import org.h2.tools.Server;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.h2.tools.Server;
+import org.springframework.context.annotation.Configuration;
 
 import java.sql.SQLException;
 
-public class H2Config {
+@Configuration
+public class H2Configuration {
 
     @Bean
-    @ConfigurationProperties("spring.datasource")
+    @ConfigurationProperties("spring.datasource.hikari")
     public HikariDataSource dataSource() throws SQLException {
         Server server = defaultRun();
         return new HikariDataSource();
