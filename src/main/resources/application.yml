@@ -6,10 +6,12 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     ## Data.sql insert
     defer-datasource-initialization: true
-#  datasource:
-#    jdbc-url: jdbc:h2:tcp://localhost:9092/mem:testdb
-#    username: sa
-#    password:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate.format_sql: true
+      hibernate.jdbc.lob.non_contextual_creation: true
+    show-sql: true
   datasource:
     driver-class-name: org.h2.Driver
     hikari:
@@ -17,7 +19,11 @@ spring:
       driver-class-name: org.h2.Driver
       username: sa
       password:
-
     dbcp2:
       test-while-idle: true
       validation-query: SELECT 1
+
+logging:
+  level:
+    org:
+      hibernate.type.descriptor.sql.BasicBinder: TRACE
