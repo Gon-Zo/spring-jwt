@@ -30,6 +30,12 @@ dependencies {
     implementation group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '7.0.19'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.security:spring-security-jwt:1.1.1.RELEASE"
+    implementation "com.auth0:jwks-rsa:0.3.0"
+    implementation "io.jsonwebtoken:jjwt:0.9.1"
+
 }
 
 test {
