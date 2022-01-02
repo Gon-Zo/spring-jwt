@@ -21,4 +21,12 @@ public class BaseTimeEntity {
     @DateTimeFormat(pattern = "yyyy-mm-dd hh:mm:ss.s")
     private Date updatedDate;
 
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
 }
