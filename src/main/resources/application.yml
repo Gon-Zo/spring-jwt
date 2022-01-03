@@ -2,6 +2,12 @@ spring:
   sql:
     init:
       mode: always
+  thymeleaf:
+    mode: HTML
+    prefix: classpath:templates/
+    suffix: .html
+    cache: false
+    check-template-location: true
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     ## Data.sql insert

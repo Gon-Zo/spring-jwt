@@ -34,6 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authenticated();
 
         http.formLogin()
+                .loginPage("/login")
                 .loginProcessingUrl("/login-progress")
 //                .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
