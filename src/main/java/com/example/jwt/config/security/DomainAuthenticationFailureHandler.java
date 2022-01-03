@@ -26,22 +26,14 @@ public class DomainAuthenticationFailureHandler implements AuthenticationFailure
         try {
 
 //            response.reset();
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            Map<String, Object> responseMap = new HashMap<>();
-
-            String message = getExceptionMessage(exception);
-
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            Map<String, Object> responseMap = new HashMap<>();
 //            responseMap.put("status", 401);
-//
 //            responseMap.put("message", message);
-//
 //            response.getOutputStream().println(objectMapper.writeValueAsString(responseMap));
 
-//            response.ad
-
-            response.sendRedirect("/error.html");
+            String message = getExceptionMessage(exception);
+            response.sendError(401, message);
 
         } catch (IOException e) {
             e.printStackTrace();
