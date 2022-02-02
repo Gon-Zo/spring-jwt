@@ -1,15 +1,27 @@
 package com.example.jwt.web;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.example.jwt.service.TokenService;
+import com.example.jwt.service.dto.LoginDTO;
+import com.example.jwt.web.docs.ViewResourceDocs;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-public class ViewResource {
+import javax.validation.Valid;
 
-    @GetMapping("/error")
-    public String viewerErrorPage() {
-        return "error.html";
-    }
+@RestController
+@RequiredArgsConstructor
+public class ViewResource implements ViewResourceDocs {
 
+  private final TokenService tokenService;
+
+  @PostMapping("/login")
+  public void login(@Valid @RequestBody LoginDTO dto) {}
+
+  @PostMapping("/logout/{userId}")
+  public void logout(@PathVariable Long userId) {
+    tokenService.removeToken(userId);
+  }
 }

@@ -1,20 +1,22 @@
+buildscript {
+    ext {
+        swaggerVersion = "3.0.0"
+    }
+}
+
 plugins {
-    id 'org.springframework.boot' version '2.6.2'
+    id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-    id 'org.springframework.experimental.aot' version '0.11.1'
-    id 'org.hibernate.orm'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = "11"
+targetCompatibility = "11"
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
+assert System.properties["java.specification.version"] == "1.8" || "1.9" || "10" || "11" || "12" || "13" || "14" || "15"
+
 
 repositories {
     maven { url 'https://repo.spring.io/release' }
@@ -27,31 +29,29 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'com.h2database:h2'
-    implementation group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '7.0.19'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    implementation "io.springfox:springfox-boot-starter:${swaggerVersion}"
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.security:spring-security-jwt:1.1.1.RELEASE"
     implementation "com.auth0:jwks-rsa:0.3.0"
     implementation "io.jsonwebtoken:jjwt:0.9.1"
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:1.17"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    if (project.hasProperty("prod")) {
+        implementation 'mysql:mysql-connector-java'
+    }
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
 
-bootBuildImage {
-    builder = 'paketobuildpacks/builder:tiny'
-    environment = ['BP_NATIVE_IMAGE': 'true']
-}
-
-hibernate {
-    enhance {
-        enableLazyInitialization = true
-        enableDirtyTracking = true
-        enableAssociationManagement = true
-        enableExtendedEnhancement = false
-    }
+bootJar {
+    enabled = true
 }

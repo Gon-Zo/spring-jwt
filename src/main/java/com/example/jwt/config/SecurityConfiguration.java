@@ -1,55 +1,66 @@
 package com.example.jwt.config;
 
+import com.example.jwt.config.security.CorsFilter;
+import com.example.jwt.config.security.JwtExceptionFilter;
+import com.example.jwt.config.security.JwtLoginFilter;
+import com.example.jwt.config.security.JwtValidFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-@Configurable
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+  @Value("${jwt.key}")
+  private String jwtKey;
 
-    private final AuthenticationFailureHandler authenticationFailureHandler;
+  private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+  private final AuthenticationFailureHandler authenticationFailureHandler;
 
-        http.cors().disable()
-                .cors().disable();
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.csrf()
+        .disable()
+        .cors()
+        .disable()
+        .addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class)
+        .formLogin()
+        .disable()
+        .addFilterBefore(new JwtExceptionFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new JwtValidFilter(jwtKey), UsernamePasswordAuthenticationFilter.class);
+  }
 
-        http.authorizeRequests()
-                .antMatchers("/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-        http.formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login-progress")
-                .successHandler(authenticationSuccessHandler)
-                .failureHandler(authenticationFailureHandler)
-                .permitAll();
+  private JwtLoginFilter jwtLoginFilter() throws Exception {
+    return new JwtLoginFilter(
+        "/login",
+        authenticationManagerBean(),
+        authenticationSuccessHandler,
+        authenticationFailureHandler);
+  }
 
-    }
-
-    /**
-     * password encode setting </br>
-     *
-     * @return PasswordEncoder
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+  @Bean
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 }

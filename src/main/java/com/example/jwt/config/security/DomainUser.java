@@ -1,23 +1,33 @@
 package com.example.jwt.config.security;
 
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DomainUser extends User {
 
-    public DomainUser(com.example.jwt.domain.User user) {
-        super(user.getEmail(), user.getPassword(), new ArrayList<>());
-    }
+  private Long id;
 
-    public DomainUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-    }
+  private String name;
 
-    public DomainUser(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-    }
+  public DomainUser(com.example.jwt.domain.User user) {
+    super(user.getEmail(), user.getPassword(), user.getGrantedAuthority());
+    this.id = user.getId();
+    this.name = user.getName();
+  }
 
+  public Long getId() {
+    return this.id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public List<String> getAuthoritiesToStringList() {
+    return this.getAuthorities().stream()
+        .map(grantedAuthority -> grantedAuthority.getAuthority())
+        .collect(Collectors.toList());
+  }
 }

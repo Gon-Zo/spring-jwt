@@ -1,48 +1,66 @@
 package com.example.jwt.service;
 
+import com.example.jwt.config.security.SecurityConstants;
 import com.example.jwt.domain.Authority;
 import com.example.jwt.domain.User;
-import com.example.jwt.enums.AuthorityNames;
-import com.example.jwt.repository.AuthorityRepository;
 import com.example.jwt.repository.UserRepository;
+import com.example.jwt.service.dto.IPageUser;
+import com.example.jwt.service.dto.PageDTO;
+import com.example.jwt.service.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = Exception.class)
 public class UserService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
-    private final AuthorityRepository authorityRepository;
+  @Transactional(rollbackFor = Exception.class)
+  public User joinUser(UserDTO dto) {
+    User entity = dto.toEntity();
+    entity.setNewUser(passwordEncoder.encode(dto.getPassword()), getAuthorities());
+    userRepository.save(entity);
+    return entity;
+  }
 
-    @Transactional
-    public void initUserData() {
+  @Transactional(readOnly = true, rollbackFor = Exception.class)
+  public User getUser(Long id) {
+    return userRepository.findById(id).orElse(User.builder().build());
+  }
 
-        Set<Authority> authorities = new HashSet<>();
+  @Transactional(readOnly = true, rollbackFor = Exception.class)
+  public Page<IPageUser> getUserList(PageDTO dto) {
 
-        authorities.add(Authority.builder().name(AuthorityNames.ADMIN.getValue()).build());
-        authorities.add(Authority.builder().name(AuthorityNames.USER.getValue()).build());
+    PageRequest pageRequest = PageRequest.of(dto.getPage(), dto.getSize());
 
-        authorityRepository.saveAll(authorities);
-
-        User entity = User.builder()
-                .email("admin")
-                .password(passwordEncoder.encode("12345"))
-                .authorities(authorities)
-                .build();
-
-        userRepository.save(entity);
-
+    switch (dto.getSearchType()) {
+      case EMAIL:
+        return userRepository.findAllByEmailContaining(
+            pageRequest, dto.getSearchValue(), IPageUser.class);
+      case NAME:
+        return userRepository.findAllByNameContaining(
+            pageRequest, dto.getSearchValue(), IPageUser.class);
+      case EMAIL_NAME:
+        return userRepository.findAllByNameContainingOrEmailContaining(
+            pageRequest, dto.getSearchValue(), dto.getSearchValue(), IPageUser.class);
+      default:
+        return userRepository.findAllProjectedBy(pageRequest, IPageUser.class);
     }
+  }
 
+  private Set<Authority> getAuthorities() {
+    Set<Authority> authorities = new HashSet<>();
+    authorities.add(Authority.builder().name(SecurityConstants.ROLE_USER).build());
+    return authorities;
+  }
 }

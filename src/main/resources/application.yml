@@ -2,34 +2,53 @@ spring:
   sql:
     init:
       mode: always
-  thymeleaf:
-    mode: HTML
-    prefix: classpath:templates/
-    suffix: .html
-    cache: false
-    check-template-location: true
+    dbcp2:
+      test-while-idle: true
+      validation-query: SELECT 1
+    h2:
+      console:
+        enabled: true
+  datasource:
+    driver-class-name: org.h2.Driver
+    hikari:
+      jdbc-url: jdbc:h2:tcp://localhost:9095/mem:testdb
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    ## Data.sql insert
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: create-drop
     properties:
+      hibernate.jdbc.time_zone: UTC
+      hibernate.id.new_generator_mappings: false
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.jdbc.batch_size: 25
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.jdbc.fetch_size: 150
+      hibernate.criteria.literal_handling_mode: BIND
+      hibernate.query.fail_on_pagination_over_collection_fetch: true
+      hibernate.query.in_clause_parameter_padding: true
       hibernate.format_sql: true
       hibernate.jdbc.lob.non_contextual_creation: true
     show-sql: true
-  datasource:
-    driver-class-name: org.h2.Driver
-    hikari:
-      jdbc-url: jdbc:h2:tcp://localhost:9092/mem:testdb
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
-    dbcp2:
-      test-while-idle: true
-      validation-query: SELECT 1
+    open-in-view: true
 
 logging:
   level:
     org:
       hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+jasypt:
+  encryptor:
+    password: order112!!
+
+jwt:
+  key: ENC(xxOAUVk4nQdy+sWgp+I+SLO8dTwOffG6TaHZVbajYo9WGU/xfH2ylw==)

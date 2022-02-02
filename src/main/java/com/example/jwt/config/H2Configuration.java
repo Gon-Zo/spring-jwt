@@ -11,19 +11,11 @@ import java.sql.SQLException;
 @Configuration
 public class H2Configuration {
 
-    @Bean
-    @ConfigurationProperties("spring.datasource.hikari")
-    public HikariDataSource dataSource() throws SQLException {
-        Server server = defaultRun();
-        return new HikariDataSource();
-    }
-
-    private Server defaultRun() throws SQLException {
-        return Server.createTcpServer(
-                "-tcp",
-                "-tcpAllowOthers",
-                "-ifNotExists",
-                "-tcpPort", 9092 + "").start();
-    }
-
+  @Bean
+  @ConfigurationProperties("spring.datasource.hikari")
+  public HikariDataSource dataSource() throws SQLException {
+    Server.createTcpServer("-tcp", "-tcpAllowOthers", "-ifNotExists", "-tcpPort", 9095 + "")
+        .start();
+    return new HikariDataSource();
+  }
 }
