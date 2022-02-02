@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="JwtApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="jwt.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.jwt.JwtApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
