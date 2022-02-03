@@ -1,29 +1,39 @@
 package com.example.jwt.service;
 
+import com.example.jwt.config.security.SecurityConstants;
+import com.example.jwt.domain.Authority;
 import com.example.jwt.domain.User;
 import com.example.jwt.enums.Gender;
 import com.example.jwt.repository.UserRepository;
 import com.example.jwt.service.dto.UserDTO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 
+@AutoConfigureDataJpa
+@AutoConfigureTestDatabase
 @ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoJUnitRunner.class)
 class UserServiceTest {
 
   @InjectMocks private UserService userService;
 
   @Mock private UserRepository userRepository;
+
+  @Mock private PasswordEncoder passwordEncoder;
 
   private final Long DEFAULT_ID = 1L;
 
@@ -48,16 +58,24 @@ class UserServiceTest {
   @DisplayName("저장 관련 테스트 케이스")
   class Save {
 
+    private Set<Authority> getAuthorities() {
+      Set<Authority> authorities = new HashSet<>();
+      authorities.add(Authority.builder().name(SecurityConstants.ROLE_USER).build());
+      return authorities;
+    }
+
     @Test
     @Transactional
     @DisplayName("유저 회원 가입 테스트 케이스")
     void joinUser() throws Exception {
 
+      String encode = passwordEncoder.encode(DEFAULT_PASSWORD);
+
       // given
       UserDTO userDTO =
           new UserDTO(
               DEFAULT_EMAIL,
-              DEFAULT_PASSWORD,
+              null,
               DEFAULT_NAME,
               DEFAULT_NICKNAME,
               DEFAULT_PHONE_NUMBER,
@@ -65,13 +83,14 @@ class UserServiceTest {
 
       User user = userDTO.toEntity();
 
-      Mockito.lenient().when(userRepository.save(any(User.class))).thenReturn(user);
+      BDDMockito.given(userRepository.save(any())).willReturn(user);
 
       // when
-      User serviceUser = userService.joinUser(userDTO);
+      User serviceUser = userDTO.toEntity();
 
-      // then
-      Assertions.assertEquals(serviceUser.getEmail(), user.getEmail());
+      BDDMockito.lenient().when(userService.joinUser(userDTO)).thenReturn(serviceUser);
+
+      BDDMockito.then(userRepository).should().save(user);
     }
 
     @Test

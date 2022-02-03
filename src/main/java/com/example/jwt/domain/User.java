@@ -2,10 +2,7 @@ package com.example.jwt.domain;
 
 import com.example.jwt.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.BatchSize;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +15,7 @@ import java.util.stream.Collectors;
 @Table
 @Getter
 @Entity
+@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -61,19 +59,6 @@ public class User {
       joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
       inverseJoinColumns = @JoinColumn(name = "authority_name", referencedColumnName = "name"))
   private Set<Authority> authorities = new HashSet();
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof User) || Hibernate.getClass(o) != Hibernate.getClass(this)) return false;
-    User user = (User) o;
-    return Objects.equals(user.id, this.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return id.intValue();
-  }
 
   @Builder
   public User(
@@ -120,5 +105,23 @@ public class User {
   public String getPassword() {
     if (null == this.password || "" == this.password) return "";
     return password;
+  }
+
+  public User id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof User) || Hibernate.getClass(o) != Hibernate.getClass(this)) return false;
+    User user = (User) o;
+    return Objects.equals(user.id, this.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id, this.email);
   }
 }

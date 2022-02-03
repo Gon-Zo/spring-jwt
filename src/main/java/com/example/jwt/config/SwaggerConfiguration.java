@@ -26,7 +26,7 @@ public class SwaggerConfiguration {
     return new Docket(DocumentationType.OAS_30)
         .useDefaultResponseMessages(false)
         .select()
-        .apis(RequestHandlerSelectors.basePackage("com.example.order.web"))
+        .apis(RequestHandlerSelectors.basePackage("com.example.jwt.web"))
         .paths(PathSelectors.any())
         .build()
         .apiInfo(apiInfo())

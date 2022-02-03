@@ -4,6 +4,7 @@ import com.example.jwt.domain.User;
 import com.example.jwt.utils.JwtUtils;
 import com.google.common.net.HttpHeaders;
 import io.jsonwebtoken.Claims;
+import io.swagger.models.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -56,7 +57,7 @@ public class JwtValidFilter extends OncePerRequestFilter {
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
     String uri = request.getRequestURI();
-    boolean test = !(uri.startsWith("/api/user") || uri.startsWith("/api/users"));
-    return test;
+    String method = request.getMethod();
+    return !((uri.startsWith("/api/user") && HttpMethod.POST.equals(method)) || uri.startsWith("/api/users"));
   }
 }
