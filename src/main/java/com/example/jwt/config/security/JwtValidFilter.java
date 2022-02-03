@@ -58,6 +58,6 @@ public class JwtValidFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
     String uri = request.getRequestURI();
     String method = request.getMethod();
-    return !((uri.startsWith("/api/user") && HttpMethod.POST.equals(method)) || uri.startsWith("/api/users"));
+    return !((uri.startsWith("/api/user") && !HttpMethod.POST.equals(method)) || uri.startsWith("/api/users"));
   }
 }

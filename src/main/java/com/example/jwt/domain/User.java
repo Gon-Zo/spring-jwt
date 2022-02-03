@@ -2,7 +2,10 @@ package com.example.jwt.domain;
 
 import com.example.jwt.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.BatchSize;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +18,6 @@ import java.util.stream.Collectors;
 @Table
 @Getter
 @Entity
-@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
