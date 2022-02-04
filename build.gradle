@@ -1,21 +1,14 @@
-buildscript {
-    ext {
-        swaggerVersion = "3.0.0"
-    }
-}
-
 plugins {
-    id 'org.springframework.boot' version '2.6.3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
     id 'java'
 }
 
-group = 'com.example'
+group = 'com.example.jwt'
+
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = "11"
 targetCompatibility = "11"
-
-assert System.properties["java.specification.version"] == "1.8" || "1.9" || "10" || "11" || "12" || "13" || "14" || "15"
 
 
 repositories {
@@ -31,13 +24,13 @@ dependencies {
     implementation 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+    implementation "com.google.code.gson:gson:${gson_version}"
+    implementation "org.apache.commons:commons-lang3:${commons_lang_version}"
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-    implementation "io.springfox:springfox-boot-starter:${swaggerVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "io.springfox:springfox-boot-starter:${swagger_version}"
+    implementation "org.springframework.boot:spring-boot-starter-security:"
     implementation "org.springframework.security:spring-security-jwt:1.1.1.RELEASE"
     implementation "com.auth0:jwks-rsa:0.3.0"
     implementation "io.jsonwebtoken:jjwt:0.9.1"
@@ -46,12 +39,40 @@ dependencies {
     if (project.hasProperty("prod")) {
         implementation 'mysql:mysql-connector-java'
     }
+//    implementation "org.springframework.boot:spring-boot-starter-actuator"
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-bootJar {
-    enabled = true
+//bootJar {
+//    enabled = true
+//}
+
+
+def profiles = 'local'
+
+springBoot {
+    buildInfo()
+
 }
+
+bootRun {
+    args = []
+}
+
+processResources {
+    inputs.property('version', version)
+    inputs.property('springProfiles', profiles)
+    filesMatching("**/application.yml") {
+        filter {
+            it.replace("#project.version#", version)
+        }
+        filter {
+            it.replace("#spring.profiles.active#", profiles)
+        }
+    }
+}
+
+bootJar.dependsOn processResources

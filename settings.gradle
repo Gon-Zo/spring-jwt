@@ -1,9 +1,11 @@
 pluginManagement {
+
     repositories {
         maven { url 'https://repo.spring.io/release' }
         mavenCentral()
         gradlePluginPortal()
     }
+
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == 'org.hibernate.orm') {
@@ -11,5 +13,12 @@ pluginManagement {
             }
         }
     }
+
+    plugins {
+        id 'org.springframework.boot' version "${spring_version}"
+        id 'io.spring.dependency-management' version "${spring_management_version}"
+        id 'java'
+    }
+
 }
-rootProject.name = 'jwt'
+rootProject.name = "${root_name}"
